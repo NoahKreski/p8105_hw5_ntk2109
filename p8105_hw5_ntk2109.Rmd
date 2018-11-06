@@ -8,8 +8,11 @@ output: github_document
 
 ```{r Problem One}
 library(tidyverse)
-df = data_frame(file_name = list.files(path = "./data", full.names = T))
+df = tibble(
+  filenames = list.files("./data", full.names = T),
+  map(filenames,read_csv))
 
-#output = purrr::map(df, reading)
-#mapped_df = map(df, read_csv)
+df%>%
+  unnest()
+
 ```

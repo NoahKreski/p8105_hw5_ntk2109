@@ -4,15 +4,36 @@ author: "Noah Kreski"
 date: "November 3, 2018"
 output: github_document
 ---
-###Creating a Tidy DataFrame
+###Problem One
 
-```{r Problem One}
+```{r Problem One, message = FALSE}
 library(tidyverse)
+#I am creating a dataframe of tidy longitudinal data
 df = tibble(
+  #I am beginning by getting all file names using list.files
   filenames = list.files("./data", full.names = T),
-  map(filenames,read_csv))
-
-df%>%
-  unnest()
-
+  #I am using the map function to iterate over files and save the result as a new variable
+  map(filenames,read_csv))%>%
+  #In order to further tidy the data, I am unnesting
+ unnest()%>%
+  #I'm gathering the data values to tidy them
+ gather(key = week, value = value, week_1:week_8)%>%
+  #I am mutating file names to just have arm and ID
+ mutate(week = as.numeric(str_replace(week, "week_","")))%>%
+ mutate(filenames = str_replace(filenames, "./data/", ""))%>%
+ mutate(filenames = str_replace(filenames, ".csv", ""))%>%
+ mutate(filenames = str_replace(filenames, "con", "Control"))%>%
+ mutate(filenames = str_replace(filenames, "exp", "Experimental"))%>%
+  #I am creating a copy of the filename to split into ID and Arm variables
+ mutate(filenames_split = filenames)%>%
+ separate(filenames_split, into = c("arm", "subject_id"), sep = "_")%>%
+ mutate(arm = as.factor(arm))%>%
+ mutate(subject_id=as.numeric(subject_id))
+#I want to show the final data frame
+df
+#I am plotting data over time by participant, grouped by arm
+ggplot(data = df, aes(x=week, y = value, group = filenames , color = arm))+ geom_line()
+       
 ```
+
+The above visual shows the patterns in data over time by participant, grouped by arm. The experimental arm showed much more growth over time, whereas the control group values stagnated.

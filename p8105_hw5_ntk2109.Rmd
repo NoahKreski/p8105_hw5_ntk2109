@@ -45,13 +45,22 @@ The above visual shows the patterns in data over time by participant, grouped by
 
 ```{r Problem Two, message = FALSE}
 Washington_data = read_csv("./data/WashingtonPost/homicide-data.csv")%>%
-                  mutate(city_state = paste(city,state, sep = ","))
-Washington_data%>%
-                  group_by(city_state)%>%
-                  summarize(n = n())
-Washington_data%>%
-                  filter(disposition != "Closed by arrest")%>%
-                  group_by(city_state)%>%
-                  summarize(n = n())
+                  mutate(city_state = paste(city,state, sep = ","))%>%
+                  filter(city_state != "Tulsa,AL")
+                  
+Washington_Summary = Washington_data%>%
+                     group_by(city_state)%>%
+                     summarize(n = n())
+Washington_unsolved = Washington_data%>%
+                      filter(disposition != "Closed by arrest")%>%
+                      group_by(city_state)%>%
+                      summarize(unsolved_n = n())
+Washington_total = full_join(Washington_Summary, Washington_unsolved, by = "city_state")
 
+```
+
+
+```{r Problem Two Baltimore, message = FALSE}
+prop.test(filter(Washington_total, city_state == "Baltimore,MD")$unsolved_n, filter(Washington_total, city_state == "Baltimore,MD")$n)%>%
+  broom::tidy()
 ```

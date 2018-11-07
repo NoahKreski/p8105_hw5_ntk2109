@@ -34,6 +34,11 @@ df = tibble(
  mutate(subject_id=as.numeric(subject_id))
 #I want to show the final data frame
 df
+```
+
+This data frame contains the relevant longitudinal data tidied, so each row is a value for a given arm, subject, and week, with the associated file.
+
+```{r plot longitudinal}
 #I am plotting data over time by participant, grouped by arm
 ggplot(data = df, aes(x=week, y = value, group = filenames , color = arm))+ geom_line()
        
@@ -62,5 +67,6 @@ Washington_total = full_join(Washington_Summary, Washington_unsolved, by = "city
 
 ```{r Problem Two Baltimore, message = FALSE}
 prop.test(filter(Washington_total, city_state == "Baltimore,MD")$unsolved_n, filter(Washington_total, city_state == "Baltimore,MD")$n)%>%
-  broom::tidy()
+  broom::tidy()#%>%
+  #keep(estimate, conf.low, conf.high)
 ```

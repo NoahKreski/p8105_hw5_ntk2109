@@ -48,6 +48,8 @@ The above visual shows the patterns in data over time by participant, grouped by
 
 ###Problem Two
 
+The raw data provide homicide victim information, such as name and demographics of sex and race, but also geographic information, both by city and state as well as latitude and longitude. The outcome of each homicide, given by the variable "disposition" provides context for whether a homicide is solved or unsolved in these 50 geographic areas.
+
 ```{r Problem Two, message = FALSE}
 #I am reading in the homicide data, and creating the city_state variable, while also removing an erroneous entry.
 Washington_data = read_csv("./data/WashingtonPost/homicide-data.csv")%>%
@@ -85,8 +87,6 @@ proportion_function = function(x) {
   prop.test(filter(Washington_total, city_state == x)$unsolved_n, filter(Washington_total, city_state == x)$n)%>%
   broom::tidy()%>%
   select(estimate, conf.low, conf.high)
-  
-  
 }
 #This code will iterate the function over all cities, produce a column with tibbles, and unnest to generate proportions and CIs for every city.
 city_df = tibble(city_list = (c(Washington_total$city_state)),
@@ -103,3 +103,5 @@ mutate(city_list = forcats::fct_reorder(city_list, estimate))%>%
 #I am creating a visual with proportions by location, with error bars, and formatting appropriately.
 ggplot( aes(x = city_list, y = estimate, group = city_list)) + geom_point() +theme(axis.text.x = element_text(angle = 70, hjust = 1)) + geom_errorbar( mapping=aes(x=city_list, ymin=conf.low, ymax=conf.high))+labs(title = "Proportion of Homicides that are Unsolved by Location", x = "Location", y = "Proportion of homicides that are Unsolved")
 ```
+
+The above visualization showcases the proportion of homicides that are unsolved by city.
